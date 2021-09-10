@@ -28,8 +28,9 @@ DEVICE_PACKAGE_OVERLAYS += \
 PRODUCT_AAPT_CONFIG := large
 PRODUCT_AAPT_PREF_CONFIG := mdpi
 
-# Enable low RAM comfig as we only have 1 GB RAM
-# PRODUCT_PROPERTY_OVERRIDES += ro.config.low_ram=true
+# Set lowram options
+PRODUCT_PROPERTY_OVERRIDES += \
+     ro.config.low_ram=true \
 
 # Init files
 PRODUCT_COPY_FILES += \
@@ -51,6 +52,7 @@ PRODUCT_PACKAGES += \
 $(call inherit-product, device/common/gps/gps_us_supl.mk)
 
 PRODUCT_PACKAGES += \
+    android.hardware.gnss@1.0-impl \
     libgpsd-compat \
     libstlport
 
@@ -72,13 +74,27 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
+# Media
+PRODUCT_PACKAGES += \
+    android.hardware.media@1.0 \
+    android.hardware.media.omx@1.0 \
+    android.hardware.media.omx@1.0-utils \
+    
+# Default OMX service to non-Treble
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.media.treble_omx=false
+
 # Media profiles
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml \
     $(LOCAL_PATH)/configs/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml \
-    $(LOCAL_PATH)/configs/media_profiles_V1_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/media_profiles_V1_0.xml \
+    $(LOCAL_PATH)/configs/media_profiles.xml:system/etc/media_profiles.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_audio.xml:system/etc/media_codecs_google_audio.xml \
     frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:system/etc/media_codecs_google_telephony.xml
+
+#Audio effects
+PRODUCT_COPY_FILES += \
+    device/samsung/espresso/configs/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml
 
 # Keylayout
 PRODUCT_COPY_FILES += \
@@ -114,9 +130,12 @@ PRODUCT_PACKAGES += \
 #WiFi
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service \
-    android.hardware.wifi.offload@1.0-service \
     libwpa_client \
     wificond
+
+# Vibrator HAL
+PRODUCT_PACKAGES += \
+    android.hardware.vibrator@1.0-impl
 
 # F2FS filesystem
 PRODUCT_PACKAGES += \
@@ -132,6 +151,10 @@ PRODUCT_PACKAGES += \
 # Samsung dock keyboard
 PRODUCT_PACKAGES += \
     dock_kbd_attach
+
+# DRM
+PRODUCT_PACKAGES += \
+    libwvm \
 
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
@@ -167,3 +190,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 $(call inherit-product-if-exists, vendor/samsung/espresso/espresso-vendor.mk)
 $(call inherit-product, frameworks/native/build/tablet-dalvik-heap.mk)
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/firmware/bcm4330/device-bcm.mk)
+# Widevine
+$(call inherit-product, vendor/widevine/arm-generic/widevine-vendor.mk)
+# Build GO
+# $(call inherit-product, build/make/target/product/go_defaults.mk)

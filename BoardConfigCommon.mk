@@ -20,6 +20,9 @@
 # Build SGX KM
 -include hardware/ti/omap4/pvr-km.mk
 
+#Widewvine
+-include vendor/widevine/arm-generic/BoardConfigVendor.mk
+
 TARGET_NO_BOOTLOADER := true
 
 TARGET_BOOTLOADER_BOARD_NAME := piranha
@@ -33,10 +36,19 @@ BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_BASE := 0x40000000
 BOARD_KERNEL_CMDLINE := androidboot.hardware=espresso
 
+ifneq (,$(strip $(wildcard \
+$(TARGET_KERNEL_SOURCE)/drivers/gpu/ion/ion_page_pool.c \
+$(TARGET_KERNEL_SOURCE)/drivers/staging/android/ion/ion_page_pool.c)))
+export BOARD_USE_TI_LIBION := false
+endif
+
+USE_AMAZON_DUCATI := $(if $(shell grep ^CONFIG_USE_AMAZON_DUCATI=y$$ \
+$(TARGET_KERNEL_SOURCE)/arch/arm/configs/$(TARGET_KERNEL_CONFIG)),true,)
+
 # Filesystem
 TARGET_USERIMAGES_USE_EXT4 := true
 BOARD_BOOTIMAGE_PARTITION_SIZE := 8388608
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 9316352
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 8388608
 BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1073741824
 BOARD_CACHEIMAGE_PARTITION_SIZE := 734003200
 BOARD_USERDATAIMAGE_PARTITION_SIZE := 5003787264
@@ -45,6 +57,9 @@ BOARD_FLASH_BLOCK_SIZE := 4096
 # Enable dex pre-optimization with PIC
 WITH_DEXPREOPT := true
 WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY =: true
+
+# Liblights
+TARGET_PROVIDES_LIBLIGHT := true
 
 # Configure jemalloc for low-memory
 MALLOC_SVELTE := true
@@ -64,6 +79,9 @@ WIFI_DRIVER_FW_PATH_P2P          := "/system/etc/wifi/bcmdhd_p2p.bin"
 WIFI_DRIVER_MODULE_NAME          := "bcmdhd"
 #WIFI_DRIVER_MODULE_ARG          := "firmware_path=/system/etc/wifi/bcmdhd_sta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
 WIFI_BAND                        := 802_11_ABG
+
+# Network Routing
+TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE := true
 
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
