@@ -30,7 +30,7 @@ PRODUCT_AAPT_PREF_CONFIG := mdpi
 
 # Set lowram options
 PRODUCT_PROPERTY_OVERRIDES += \
-     ro.config.low_ram=true \
+      ro.config.low_ram=true \
 
 # Init files
 PRODUCT_COPY_FILES += \
