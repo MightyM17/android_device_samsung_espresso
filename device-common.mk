@@ -74,6 +74,16 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/bluetooth/bt_vendor.conf:system/etc/bluetooth/bt_vendor.conf
 
+# Media
+PRODUCT_PACKAGES += \
+    android.hardware.media@1.0 \
+    android.hardware.media.omx@1.0 \
+    android.hardware.media.omx@1.0-utils \
+
+# Default OMX service to non-Treble
+PRODUCT_PROPERTY_OVERRIDES += \
+    persist.media.treble_omx=false
+
 # Media profiles
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml \
