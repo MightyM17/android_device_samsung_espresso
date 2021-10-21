@@ -65,7 +65,8 @@ PRODUCT_PACKAGES += \
     wpa_supplicant.conf
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    wifi.interface=wlan0
+    wifi.interface=wlan0 \
+    wlan.vendor=broadcom
 
 # Bluetooth
 PRODUCT_COPY_FILES += \
@@ -113,8 +114,9 @@ PRODUCT_PACKAGES += \
 #WiFi
 PRODUCT_PACKAGES += \
     android.hardware.wifi@1.0-service \
-    wificond \
-    wifilogd \
+    android.hardware.wifi.offload@1.0-service \
+    libwpa_client \
+    wificond
 
 # F2FS filesystem
 PRODUCT_PACKAGES += \
