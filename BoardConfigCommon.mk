@@ -20,6 +20,9 @@
 # Build SGX KM
 -include hardware/ti/omap4/pvr-km.mk
 
+#Widewvine
+-include vendor/widevine/arm-generic/BoardConfigVendor.mk
+
 TARGET_NO_BOOTLOADER := true
 
 TARGET_BOOTLOADER_BOARD_NAME := piranha
