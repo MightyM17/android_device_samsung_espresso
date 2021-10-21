@@ -49,6 +49,9 @@ BOARD_FLASH_BLOCK_SIZE := 4096
 WITH_DEXPREOPT := true
 WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY =: true
 
+# Liblights
+TARGET_PROVIDES_LIBLIGHT := true
+
 # Configure jemalloc for low-memory
 MALLOC_SVELTE := true
 
