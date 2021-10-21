@@ -71,6 +71,9 @@ WIFI_DRIVER_MODULE_NAME          := "bcmdhd"
 #WIFI_DRIVER_MODULE_ARG           := "firmware_path=/system/etc/wifi/bcmdhd_sta.bin nvram_path=/system/etc/wifi/nvram_net.txt"
 WIFI_BAND                        := 802_11_ABG
 
+# Network Routing
+TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE := true
+
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_BLUETOOTH_BCM := true
