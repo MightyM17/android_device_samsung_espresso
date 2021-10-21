@@ -133,6 +133,10 @@ PRODUCT_PACKAGES += \
     libwpa_client \
     wificond
 
+# Vibrator HAL
+PRODUCT_PACKAGES += \
+    android.hardware.vibrator@1.0-impl
+
 # F2FS filesystem
 PRODUCT_PACKAGES += \
     mkfs.f2fs \
