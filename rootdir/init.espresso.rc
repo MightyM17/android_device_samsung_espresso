@@ -38,9 +38,6 @@ on post-fs-data
     # wifi
     chown wifi wifi /sys/module/bcmdhd/parameters/firmware_path
 
-    # sensors
-    chmod -R 777 /dev/input
-
     # dmrpc
     mkdir /data/smc 0770 drmrpc drmrpc
     chown drmrpc drmrpc /data/smc/counter.bin
