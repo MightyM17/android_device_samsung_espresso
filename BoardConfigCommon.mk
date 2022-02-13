@@ -25,6 +25,9 @@
 
 TARGET_NO_BOOTLOADER := true
 
+# F2FS filesystem
+TARGET_USERIMAGES_USE_F2FS := true
+
 TARGET_BOOTLOADER_BOARD_NAME := piranha
 
 # Binder API version
