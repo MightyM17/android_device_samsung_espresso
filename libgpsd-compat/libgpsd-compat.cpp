@@ -1,8 +1,10 @@
 #define LOG_TAG "libgpsd-compat"
+#include <sensor/SensorManager.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <sys/types.h>
 #include <utils/Log.h>
 #include <hardware/power.h>
 #include <hardware/hardware.h>
@@ -29,75 +31,74 @@
 
 
 //various funcs we'll need to call, in their mangled form
-
+extern "C"{
     //android::String8::String8(char const*)
-    extern void _ZN7android7String8C1EPKc(void **str8P, const char *str);
+    void _ZN7android7String8C1EPKc(void **str8P, const char *str);
 
     //android::String8::~String8()
-    extern void _ZN7android7String8D1Ev(void **str8P);
+    void _ZN7android7String8D1Ev(void **str8P);
 
     //android::String16::String16(char const*)
-    extern void _ZN7android8String16C1EPKc(void **str16P, const char *str);
+    void _ZN7android8String16C1EPKc(void **str16P, const char *str);
 
     //android::String16::~String16()
-    extern void _ZN7android8String16D1Ev(void **str16P);
+    void _ZN7android8String16D1Ev(void **str16P);
 
     //android::SensorManager::~SensorManager()
-    extern void _ZN7android13SensorManagerD1Ev(void *sensorMgr);
+    void _ZN7android13SensorManagerD1Ev(void *sensorMgr);
 
     //android::SensorManager::SensorManager(android::String16 const&)
-    extern void _ZN7android13SensorManagerC1ERKNS_8String16E(void *sensorMgr, void **str16P);
+    void _ZN7android13SensorManagerC1ERKNS_8String16E(void *sensorMgr, void **str16P);
 
     //android::SensorManager::createEventQueue(android::String8, int)
-    extern void _ZN7android13SensorManager16createEventQueueENS_7String8Ei(void **retVal, void *sensorMgr, void **str8P, int mode);
+    void _ZN7android13SensorManager16createEventQueueENS_7String8Ei(void **retVal, void *sensorMgr, void **str8P, int mode);
 
 
 //data exports we must provide for gps library to be happy
 
-    /*
-     * DATA:     android::Singleton<android::SensorManager>::sLock
-     * USE:      INTERPOSE: a mutes that GPS lib will insist on accessing
-     * NOTES:    In L, the sensor manager exposed this lock that callers
-     *           actually locked & unlocked when accessing it. In M this
-     *           is no longer the case, but we still must provide it for
-     *           the GPS library to be happy. It will lock nothnhing, but
-     *           as long as it is a real lock and pthread_mutex_* funcs
-     *           work on it, the GPS library will be happy.
-     */
-    pthread_mutex_t _ZN7android9SingletonINS_13SensorManagerEE5sLockE = PTHREAD_MUTEX_INITIALIZER;
+/*
+* DATA:     android::Singleton<android::SensorManager>::sLock
+* USE:      INTERPOSE: a mutes that GPS lib will insist on accessing
+* NOTES:    In L, the sensor manager exposed this lock that callers
+*           actually locked & unlocked when accessing it. In M this
+*           is no longer the case, but we still must provide it for
+*           the GPS library to be happy. It will lock nothnhing, but
+*           as long as it is a real lock and pthread_mutex_* funcs
+*           work on it, the GPS library will be happy.
+*/
+pthread_mutex_t _ZN7android9SingletonINS_13SensorManagerEE5sLockE = PTHREAD_MUTEX_INITIALIZER;
 
-    /*
-     * DATA:     android::Singleton<android::SensorManager>::sInstance
-     * USE:      INTERPOSE: a singleton instance of SensorManager
-     * NOTES:    In L, the sensor manager exposed this variable, as it was
-     *           a singleton and one could just access this directly to get
-     *           the current already-existing instance if it happened to
-     *           already exist. If not one would create one and store it
-     *           there. In M this is entirely different, but the GPS library
-     *           does not know that. So we'll init it to NULL to signify that
-     *           no current instance exists, let it create one, and store it
-     *           here, and upon unloading we'll clean it up, if it is not
-     *           NULL (which is what it would be if the GPS library itself
-     *           did the cleanup).
-     */
-    void* _ZN7android9SingletonINS_13SensorManagerEE9sInstanceE = NULL;
+/*
+* DATA:     android::Singleton<android::SensorManager>::sInstance
+* USE:      INTERPOSE: a singleton instance of SensorManager
+* NOTES:    In L, the sensor manager exposed this variable, as it was
+*           a singleton and one could just access this directly to get
+*           the current already-existing instance if it happened to
+*           already exist. If not one would create one and store it
+*           there. In M this is entirely different, but the GPS library
+*           does not know that. So we'll init it to NULL to signify that
+*           no current instance exists, let it create one, and store it
+*           here, and upon unloading we'll clean it up, if it is not
+*           NULL (which is what it would be if the GPS library itself
+*           did the cleanup).
+*/
+void* _ZN7android9SingletonINS_13SensorManagerEE9sInstanceE = NULL;
 
 
 //code exports we provide
 
-    //android::SensorManager::SensorManager(void)
-    void _ZN7android13SensorManagerC1Ev(void *sensorMgr);
+//android::SensorManager::SensorManager(void)
+void _ZN7android13SensorManagerC1Ev(void *sensorMgr);
 
-    //android::SensorManager::createEventQueue(void)
-    void _ZN7android13SensorManager16createEventQueueEv(void **retVal, void *sensorMgr);
+//android::SensorManager::createEventQueue(void)
+void _ZN7android13SensorManager16createEventQueueEv(void **retVal, void *sensorMgr);
 
-    //this used to exist in OpenSLL, but does not in BoringSSL - for some reason GPS library uses it anyways
-    void *CRYPTO_malloc(uint32_t sz, const char *file, uint32_t line);
+//this used to exist in OpenSLL, but does not in BoringSSL - for some reason GPS library uses it anyways
+void *CRYPTO_malloc(uint32_t sz, const char *file, uint32_t line);
 
 
 //library on-load and on-unload handlers (to help us set things up and tear them down)
-    void libEvtUnloading(void) __attribute__((destructor));
-
+void libEvtUnloading(void) __attribute__((destructor));
 
 /*
  * FUNCTION: android::SensorManager::SensorManager(void)
@@ -149,6 +150,8 @@ void *CRYPTO_malloc(uint32_t sz, const char *file, uint32_t line)
     return calloc(sz, 1);
 }
 
+long (*SSL_CTX_ctrl)(void *ctx, int cmd, long larg, void *parg);
+
 /*
  * FUNCTION: libEvtUnloading()
  * USE:      Handle library unloading
@@ -161,4 +164,9 @@ void libEvtUnloading(void)
         _ZN7android13SensorManagerD1Ev(_ZN7android9SingletonINS_13SensorManagerEE9sInstanceE);
         _ZN7android9SingletonINS_13SensorManagerEE9sInstanceE = NULL;
     }
+}
+
+ ssize_t _ZNK7android13SensorManager13getSensorListEPPKPKNS_6SensorE(void* thiz, void* list) {
+   return _ZN7android13SensorManager13getSensorListEPPKPKNS_6SensorE(thiz, list);
+ }
 }
