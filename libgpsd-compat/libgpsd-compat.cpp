@@ -32,8 +32,6 @@
 
 //various funcs we'll need to call, in their mangled form
 extern "C"{
-    ssize_t _ZN7android13SensorManager13getSensorListEPPKPKNS_6SensorE(void* thiz, void* list);
-   
     //android::String8::String8(char const*)
     void _ZN7android7String8C1EPKc(void **str8P, const char *str);
 
