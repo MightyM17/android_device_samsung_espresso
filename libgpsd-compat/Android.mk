@@ -18,9 +18,8 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SHARED_LIBRARIES := liblog libhardware_legacy libgui libbinder libutils libsensor
-LOCAL_SRC_FILES := libgpsd-compat.cpp
+LOCAL_SRC_FILES := libgpsd-compat.c
 LOCAL_MODULE := libgpsd-compat
 LOCAL_MODULE_TAGS := optional
-LOCAL_VENDOR_MODULE := true
 
 include $(BUILD_SHARED_LIBRARY)
