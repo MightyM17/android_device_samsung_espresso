@@ -81,8 +81,8 @@ PRODUCT_PACKAGES += \
     android.hardware.media.omx@1.0-utils \
 
 # Default OMX service to non-Treble
-PRODUCT_PROPERTY_OVERRIDES += \
-    persist.media.treble_omx=false
+# PRODUCT_PROPERTY_OVERRIDES += \
+    # persist.media.treble_omx=false
 
 # Media profiles
 PRODUCT_COPY_FILES += \
