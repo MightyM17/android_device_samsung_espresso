@@ -163,7 +163,10 @@ on property:ro.bootmode=charger
 on property:ro.bootmode=charger
     class_start charger
 
-service charger /sbin/healthd -c
+on property:ro.bootmode=charger
+    start pvrsrvinit
+
+service charger /charger
     class charger
     critical
-    seclabel u:r:healthd:s0
+    seclabel u:r:charger:s0
